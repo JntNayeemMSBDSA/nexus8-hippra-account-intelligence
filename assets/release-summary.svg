@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="800" viewBox="0 0 1400 800" role="img" aria-labelledby="title desc">
+  <title id="title">HIPPRA Account Intelligence Tableau release summary</title>
+  <desc id="desc">Certified account counts, portfolio mix, enrichment coverage, and release quality status.</desc>
+  <rect width="1400" height="800" fill="#f5f8fa"/>
+  <rect width="1400" height="108" fill="#093b58"/>
+  <text x="54" y="69" fill="#ffffff" font-family="Arial, sans-serif" font-size="36" font-weight="700">HIPPRA Account Intelligence</text>
+  <text x="54" y="94" fill="#b9d6e2" font-family="Arial, sans-serif" font-size="16">Certified Tableau v2 release · DuckDB / Parquet analytical system</text>
+  <rect x="1128" y="29" width="218" height="51" rx="25" fill="#1da39d"/>
+  <text x="1237" y="61" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="18" font-weight="700">17 / 17 QA PASS</text>
+
+  <g font-family="Arial, sans-serif">
+    <g transform="translate(54,144)">
+      <rect width="300" height="142" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="24" y="38" fill="#52636d" font-size="17">Portfolio accounts</text>
+      <text x="24" y="96" fill="#093b58" font-size="46" font-weight="700">88,986</text>
+    </g>
+    <g transform="translate(384,144)">
+      <rect width="300" height="142" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="24" y="38" fill="#52636d" font-size="17">Physician groups</text>
+      <text x="24" y="96" fill="#093b58" font-size="46" font-weight="700">83,367</text>
+    </g>
+    <g transform="translate(714,144)">
+      <rect width="300" height="142" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="24" y="38" fill="#52636d" font-size="17">Hospitals</text>
+      <text x="24" y="96" fill="#093b58" font-size="46" font-weight="700">5,432</text>
+    </g>
+    <g transform="translate(1044,144)">
+      <rect width="302" height="142" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="24" y="38" fill="#52636d" font-size="17">Health systems</text>
+      <text x="24" y="96" fill="#093b58" font-size="46" font-weight="700">187</text>
+    </g>
+
+    <g transform="translate(54,322)">
+      <rect width="630" height="404" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="28" y="46" fill="#093b58" font-size="24" font-weight="700">Certified account portfolio</text>
+      <text x="28" y="78" fill="#657681" font-size="15">One row per unique commercial account</text>
+      <text x="28" y="135" fill="#52636d" font-size="17">Physician groups</text>
+      <rect x="184" y="112" width="390" height="30" rx="5" fill="#093b58"/>
+      <text x="584" y="134" fill="#093b58" font-size="16" font-weight="700">83,367</text>
+      <text x="28" y="202" fill="#52636d" font-size="17">Hospitals</text>
+      <rect x="184" y="179" width="26" height="30" rx="5" fill="#da5810"/>
+      <text x="220" y="201" fill="#da5810" font-size="16" font-weight="700">5,432</text>
+      <text x="28" y="269" fill="#52636d" font-size="17">Health systems</text>
+      <rect x="184" y="246" width="4" height="30" rx="2" fill="#1da39d"/>
+      <text x="198" y="268" fill="#1da39d" font-size="16" font-weight="700">187</text>
+      <line x1="28" y1="310" x2="602" y2="310" stroke="#d9d9d9"/>
+      <text x="28" y="356" fill="#52636d" font-size="17">Provider-account relationships</text>
+      <text x="602" y="356" text-anchor="end" fill="#093b58" font-size="26" font-weight="700">3,079,707</text>
+    </g>
+
+    <g transform="translate(714,322)">
+      <rect width="632" height="404" rx="10" fill="#ffffff" stroke="#d9d9d9"/>
+      <text x="28" y="46" fill="#093b58" font-size="24" font-weight="700">Evidence coverage</text>
+      <text x="28" y="78" fill="#657681" font-size="15">Coverage and quality flags are not sales priority</text>
+      <text x="28" y="139" fill="#52636d" font-size="17">Targeted enrichment</text>
+      <text x="604" y="139" text-anchor="end" fill="#1da39d" font-size="22" font-weight="700">6,830 accounts</text>
+      <rect x="28" y="161" width="576" height="24" rx="12" fill="#e4edef"/>
+      <rect x="28" y="161" width="44" height="24" rx="12" fill="#1da39d"/>
+      <text x="28" y="218" fill="#52636d" font-size="17">Evidence review required</text>
+      <text x="604" y="218" text-anchor="end" fill="#da5810" font-size="22" font-weight="700">87,330 accounts</text>
+      <rect x="28" y="240" width="576" height="24" rx="12" fill="#e4edef"/>
+      <rect x="28" y="240" width="565" height="24" rx="12" fill="#da5810"/>
+      <rect x="28" y="307" width="576" height="67" rx="8" fill="#edf3f6"/>
+      <text x="48" y="336" fill="#093b58" font-size="16" font-weight="700">Scope guardrail</text>
+      <text x="48" y="360" fill="#52636d" font-size="14">No TAM/SAM/SOM, revenue, pricing, customer, contract, or SQL Server claims.</text>
+    </g>
+  </g>
+</svg>

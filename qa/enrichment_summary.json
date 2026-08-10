@@ -1,0 +1,24 @@
+{
+  "created_at_utc": "2026-08-10T21:32:08+00:00",
+  "descriptive_counts": {
+    "MCO_account_enrichment": 818,
+    "MCO_clinic_coverage_bridge_enrichment": 0,
+    "clinic_account_candidate_enrichment": 337,
+    "clinic_account_enrichment": 35789,
+    "clinic_network_account_enrichment": 1526,
+    "clinic_network_bridge_enrichment": 19039,
+    "enrichment_relationship_candidate": 604,
+    "enrichment_source_gap_register": 6,
+    "enrichment_source_registry": 6,
+    "health_system_account_enrichment": 639,
+    "hospital_health_system_bridge_enrichment": 4193,
+    "stage12_account_crosswalk": 23532,
+    "stage12_candidate_resolution": 310759
+  },
+  "note": "Descriptive enrichment counts only.",
+  "qa_status": "PASS_WITH_WARNINGS",
+  "run_id": "hippra_targeted_enrichment_20260810T213116Z",
+  "stage12_candidates_resolved": 5453,
+  "stage12_candidates_unresolved_or_review": 305306,
+  "workflow_version": "hippra_targeted_account_enrichment_v1"
+}

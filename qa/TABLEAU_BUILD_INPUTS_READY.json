@@ -1,0 +1,21 @@
+{
+  "analytical_system": "DuckDB plus Parquet/CSV",
+  "build_guide": "<NEXUS_PROJECT_ROOT>/13_tableau_preparation/hippra_tableau_prep_20260810T213214Z/TABLEAU_CLICK_BUILD_GUIDE.md",
+  "created_at_utc": "2026-08-10T21:32:18+00:00",
+  "do_not_publish_before_final_qa": true,
+  "grain": "one row per certified Stage 12 commercial_account_id",
+  "qa_status": "PASS",
+  "row_count": 88986,
+  "run_id": "hippra_tableau_prep_20260810T213214Z",
+  "source_stage12": "<NEXUS_PROJECT_ROOT>/12_account_level_commercial_marts/hippra_account_marts_20260730T000735Z",
+  "source_stage12e": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z",
+  "sql_server_reconstruction_status": "INCOMPLETE_SEPARATE_FUTURE_STAGE",
+  "stage12e_state_reconciliation": {
+    "current_state_path": "<NEXUS_PROJECT_ROOT>/00_control/targeted_account_enrichment_v1/state/current_state.json",
+    "historical_failed_state_archive": "<NEXUS_PROJECT_ROOT>/00_control/targeted_account_enrichment_v1/state/history/20260810T213116Z__hippra_targeted_enrichment_20260730T004611Z__FAILED.json",
+    "status": "PASS"
+  },
+  "status": "TABLEAU_BUILD_INPUTS_READY",
+  "tableau_source": "<NEXUS_PROJECT_ROOT>/13_tableau_preparation/hippra_tableau_prep_20260810T213214Z/hippra_tableau_account_360.csv",
+  "workflow_version": "hippra_tableau_preparation_v1"
+}
