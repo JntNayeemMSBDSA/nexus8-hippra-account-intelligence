@@ -1,0 +1,59 @@
+{
+  "analytical_boundaries": [
+    "Descriptive certified account, relationship, serviceability and enrichment data only.",
+    "No TAM, SAM, SOM, pricing, revenue, forecasting, customer or contract classification is present.",
+    "Missing values are preserved as null; postal geocoding is populated only for validated domestic formats.",
+    "The certified analytical system is DuckDB plus Parquet/CSV; SQL Server reconstruction remains separate and incomplete."
+  ],
+  "checks": {
+    "account_grain_row_count": true,
+    "commercial_account_id_not_null": true,
+    "commercial_account_id_unique": true,
+    "enrichment_flag_reconciliation": true,
+    "nonnegative_aggregates": true,
+    "postal_geocode_fail_closed": true,
+    "serviceability_one_to_one_coverage": true,
+    "stage12_checksum_manifest": true,
+    "stage12e_checksum_manifest": true,
+    "stage12e_raw_checksum_manifest": true
+  },
+  "created_at_utc": "2026-08-10T21:32:18+00:00",
+  "grain": "one row per certified Stage 12 commercial_account_id",
+  "observed": {
+    "account_mix": {
+      "HEALTH_SYSTEM": 187,
+      "HOSPITAL": 5432,
+      "PHYSICIAN_GROUP": 83367
+    },
+    "csv_rows": 88986,
+    "duckdb_rows": 88986,
+    "duplicate_ids": 0,
+    "enriched_accounts_expected": 6830,
+    "enriched_accounts_observed": 6830,
+    "expected_stage12_accounts": 88986,
+    "invalid_postal_geocode_rows": 0,
+    "missing_serviceability_rows": 0,
+    "negative_measure_rows": 0,
+    "null_ids": 0,
+    "parquet_rows": 88986
+  },
+  "source_verification": {
+    "stage12": {
+      "checked": 45,
+      "failures": [],
+      "passed": true
+    },
+    "stage12e": {
+      "checked": 54,
+      "failures": [],
+      "passed": true
+    },
+    "stage12e_raw_sources": {
+      "checked": 6,
+      "failures": [],
+      "passed": true
+    }
+  },
+  "status": "PASS",
+  "workflow_version": "hippra_tableau_preparation_v1"
+}

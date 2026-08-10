@@ -1,0 +1,30 @@
+{
+  "status": "PACKAGED_AND_TABLEAU_OPEN_QA_PASSED",
+  "output": "<NEXUS_PROJECT_ROOT>/14_tableau_workbook/hippra_tableau_workbook_20260810T215829Z/HIPPRA_Account_Intelligence_v2.twbx",
+  "sha256": "8107f88aad2320fbd42617f71cee85b87923c033c60375c15311f5d5871fb154",
+  "bytes": 7184660,
+  "members": [
+    "Data/HIPPRA/hippra_tableau_account_360.csv",
+    "Data/HIPPRA/hippra_tableau_account_360.hyper",
+    "HIPPRA_Account_Intelligence_v2.twb"
+  ],
+  "zip_integrity": "PASS",
+  "protected_inputs_unchanged": true,
+  "protected_sha256": {
+    "<NEXUS_PROJECT_ROOT>/14_tableau_workbook/hippra_tableau_workbook_20260810T215829Z/HIPPRA_Account_Intelligence_v2.twb": "278a269f52d825c2be7c7d4e255f5368a722289741a602baaaeac4331b610a69",
+    "<NEXUS_PROJECT_ROOT>/13_tableau_preparation/hippra_tableau_prep_20260810T213214Z/hippra_tableau_account_360.csv": "925b3d339f7f32db752b72c82005752873ee24b77929514bc3e4baac6eba3dc5",
+    "/var/folders/rs/mnsdn1294vdc19bjx38fsdjw0000gn/T/tableau-temp/#TableauTemp_1tbai6l1axl5fs15r11mw19x9o5q.hyper": "8a2c3904f9db5d0dd2981a49a158bcdffc7e8679ee942230d393722f1660269d"
+  },
+  "tableau_open_qa": {
+    "status": "PASS",
+    "application": "Tableau Public 2026.2.1 Apple silicon",
+    "workbook_load_result": "ok",
+    "workbook_open_result": "ok",
+    "load_elapsed_seconds": 0.676,
+    "open_elapsed_seconds": 0.924,
+    "detailed_error_count": 0,
+    "log_path": "<TABLEAU_REPOSITORY>/Logs/log_2.txt",
+    "test_process_pid": 8000
+  },
+  "publication_behavior": "LOCAL_ONLY_NOT_PUBLISHED_TO_TABLEAU_PUBLIC"
+}

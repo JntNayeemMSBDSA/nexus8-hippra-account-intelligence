@@ -1,0 +1,28 @@
+{
+  "status": "BUILT_PENDING_TABLEAU_RENDER_QA",
+  "base_workbook": "<NEXUS_PROJECT_ROOT>/14_tableau_workbook/hippra_tableau_workbook_20260810T215829Z/HIPPRA_Account_Intelligence_v1.twb",
+  "output_workbook": "<NEXUS_PROJECT_ROOT>/14_tableau_workbook/hippra_tableau_workbook_20260810T215829Z/HIPPRA_Account_Intelligence_v2.twb",
+  "source_csv": "<NEXUS_PROJECT_ROOT>/13_tableau_preparation/hippra_tableau_prep_20260810T213214Z/hippra_tableau_account_360.csv",
+  "protected_inputs_unchanged": true,
+  "protected_sha256": {
+    "<NEXUS_PROJECT_ROOT>/14_tableau_workbook/hippra_tableau_workbook_20260810T215829Z/HIPPRA_Account_Intelligence_v1.twb": "5a747d4ed0ad6a18b3911375b76319d075780ee050e705c59fa641f46ed3faed",
+    "<NEXUS_PROJECT_ROOT>/13_tableau_preparation/hippra_tableau_prep_20260810T213214Z/hippra_tableau_account_360.csv": "925b3d339f7f32db752b72c82005752873ee24b77929514bc3e4baac6eba3dc5"
+  },
+  "top_account_filter_count": 15,
+  "explorer_filter_count": 40,
+  "review_reason_filter_count": 1,
+  "worksheet_count": 14,
+  "dashboard_count": 3,
+  "dashboard_names": [
+    "Executive Account Landscape",
+    "Network and Geography",
+    "Data Quality and Account Explorer"
+  ],
+  "commercial_scope_guardrails": [
+    "NO_TAM_SAM_SOM",
+    "NO_REVENUE_OR_PRICING",
+    "NO_CUSTOMER_OR_CONTRACT_CLAIMS",
+    "NO_SALES_PRIORITY_INFERENCE",
+    "MISSING_IS_NOT_ZERO"
+  ]
+}

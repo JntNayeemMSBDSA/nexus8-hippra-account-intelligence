@@ -1,0 +1,184 @@
+{
+  "status": "PASS",
+  "tableau_render_qa": {
+    "status": "PASS",
+    "edition": "Tableau Public 2026.2.1 Apple silicon",
+    "license_prompt": false,
+    "workbook_loaded": true,
+    "dashboard_rendered": true,
+    "observed_headline_metrics": {
+      "portfolio_accounts": 88986,
+      "physician_groups": 83367
+    }
+  },
+  "packaged_workbook_open_qa": {
+    "status": "PASS",
+    "application": "Tableau Public 2026.2.1 Apple silicon",
+    "workbook_load_result": "ok",
+    "workbook_open_result": "ok",
+    "load_elapsed_seconds": 0.676,
+    "open_elapsed_seconds": 0.924,
+    "detailed_error_count": 0,
+    "log_path": "<TABLEAU_REPOSITORY>/Logs/log_2.txt",
+    "test_process_pid": 8000
+  },
+  "data_reconciliation": {
+    "rows": 88986,
+    "unique_accounts": 88986,
+    "PHYSICIAN_GROUP": 83367,
+    "HOSPITAL": 5432,
+    "HEALTH_SYSTEM": 187,
+    "provider_relationships": 3079707,
+    "enriched_accounts": 6830,
+    "review_attention_accounts": 87330
+  },
+  "checks": [
+    {
+      "check": "worksheet_count",
+      "status": "PASS",
+      "actual": 14,
+      "expected": 14
+    },
+    {
+      "check": "dashboard_names",
+      "status": "PASS",
+      "actual": [
+        "Executive Account Landscape",
+        "Network and Geography",
+        "Data Quality and Account Explorer"
+      ],
+      "expected": [
+        "Executive Account Landscape",
+        "Network and Geography",
+        "Data Quality and Account Explorer"
+      ]
+    },
+    {
+      "check": "dashboard_sheet_references",
+      "status": "PASS",
+      "actual": [],
+      "expected": []
+    },
+    {
+      "check": "scope_guardrails_present",
+      "status": "PASS",
+      "actual": [
+        "does not represent TAM, SAM, SOM",
+        "Review flags identify evidence gaps",
+        "Missing values remain null",
+        "MCO-to-clinic/network relationships are not documented"
+      ],
+      "expected": [
+        "does not represent TAM, SAM, SOM",
+        "Review flags identify evidence gaps",
+        "Missing values remain null",
+        "MCO-to-clinic/network relationships are not documented"
+      ]
+    },
+    {
+      "check": "source_checksum_unchanged",
+      "status": "PASS",
+      "actual": "925b3d339f7f32db752b72c82005752873ee24b77929514bc3e4baac6eba3dc5",
+      "expected": "925b3d339f7f32db752b72c82005752873ee24b77929514bc3e4baac6eba3dc5"
+    },
+    {
+      "check": "reconcile_rows",
+      "status": "PASS",
+      "actual": 88986,
+      "expected": 88986
+    },
+    {
+      "check": "reconcile_unique_accounts",
+      "status": "PASS",
+      "actual": 88986,
+      "expected": 88986
+    },
+    {
+      "check": "reconcile_PHYSICIAN_GROUP",
+      "status": "PASS",
+      "actual": 83367,
+      "expected": 83367
+    },
+    {
+      "check": "reconcile_HOSPITAL",
+      "status": "PASS",
+      "actual": 5432,
+      "expected": 5432
+    },
+    {
+      "check": "reconcile_HEALTH_SYSTEM",
+      "status": "PASS",
+      "actual": 187,
+      "expected": 187
+    },
+    {
+      "check": "reconcile_provider_relationships",
+      "status": "PASS",
+      "actual": 3079707,
+      "expected": 3079707
+    },
+    {
+      "check": "reconcile_enriched_accounts",
+      "status": "PASS",
+      "actual": 6830,
+      "expected": 6830
+    },
+    {
+      "check": "reconcile_review_attention_accounts",
+      "status": "PASS",
+      "actual": 87330,
+      "expected": 87330
+    },
+    {
+      "check": "twbx_zip_integrity",
+      "status": "PASS",
+      "actual": null,
+      "expected": null
+    },
+    {
+      "check": "twbx_members",
+      "status": "PASS",
+      "actual": [
+        "Data/HIPPRA/hippra_tableau_account_360.csv",
+        "Data/HIPPRA/hippra_tableau_account_360.hyper",
+        "HIPPRA_Account_Intelligence_v2.twb"
+      ],
+      "expected": [
+        "Data/HIPPRA/hippra_tableau_account_360.csv",
+        "Data/HIPPRA/hippra_tableau_account_360.hyper",
+        "HIPPRA_Account_Intelligence_v2.twb"
+      ]
+    },
+    {
+      "check": "twbx_checksum",
+      "status": "PASS",
+      "actual": "8107f88aad2320fbd42617f71cee85b87923c033c60375c15311f5d5871fb154",
+      "expected": "8107f88aad2320fbd42617f71cee85b87923c033c60375c15311f5d5871fb154"
+    },
+    {
+      "check": "twbx_tableau_open_qa",
+      "status": "PASS",
+      "actual": {
+        "status": "PASS",
+        "application": "Tableau Public 2026.2.1 Apple silicon",
+        "workbook_load_result": "ok",
+        "workbook_open_result": "ok",
+        "load_elapsed_seconds": 0.676,
+        "open_elapsed_seconds": 0.924,
+        "detailed_error_count": 0,
+        "log_path": "<TABLEAU_REPOSITORY>/Logs/log_2.txt",
+        "test_process_pid": 8000
+      },
+      "expected": {
+        "status": "PASS"
+      }
+    }
+  ],
+  "known_disclosures": [
+    "Targeted clinic enrichment is partial.",
+    "MCO-to-clinic/network relationships are not documented.",
+    "AHRQ linkage reflects CY2023.",
+    "Review-attention flags are evidence gaps, not sales priority.",
+    "Missing values remain null and are not converted to zero."
+  ]
+}

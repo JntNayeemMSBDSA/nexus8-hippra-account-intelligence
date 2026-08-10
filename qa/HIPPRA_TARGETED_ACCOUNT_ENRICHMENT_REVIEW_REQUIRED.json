@@ -1,0 +1,85 @@
+{
+  "MCOs_added": 818,
+  "automatic_market_sizing_started": false,
+  "clinic_candidates_retained": 337,
+  "clinic_network_relationships_added": 19039,
+  "clinic_networks_added": 1526,
+  "created_at_utc": "2026-08-10T21:32:08+00:00",
+  "critical_failures": [],
+  "explicit_MCO_coverage_relationships_added": 0,
+  "files_downloaded": 6,
+  "final_clinics_added": 35789,
+  "health_systems_added": 639,
+  "hospital_system_relationships_added": 4193,
+  "next_permitted_action": "REVIEW_ENRICHMENT_COVERAGE_AND_DECIDE_MARKET_SIZING_READINESS",
+  "output_paths": {
+    "checksums": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z/checksums.sha256",
+    "download_manifest": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z/download_manifest.json",
+    "duckdb": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z/hippra_targeted_account_enrichment.duckdb",
+    "output_root": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z",
+    "qa": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z/qa/targeted_enrichment_qa_report.json",
+    "source_registry": "<NEXUS_PROJECT_ROOT>/12E_targeted_account_enrichment/hippra_targeted_enrichment_20260810T213116Z/enrichment_source_registry.csv"
+  },
+  "protected_input_status": {
+    "baseline_path": "<NEXUS_PROJECT_ROOT>/00_control/targeted_account_enrichment_v1/protected_inputs_v1.json",
+    "changed": [],
+    "expected_file_count": 420,
+    "missing": [],
+    "unchanged": true,
+    "verified_at_utc": "2026-08-10T21:32:08+00:00"
+  },
+  "qa_status": "PASS_WITH_WARNINGS",
+  "remaining_source_gaps": 6,
+  "run_id": "hippra_targeted_enrichment_20260810T213116Z",
+  "sources_accepted": 6,
+  "sources_discovered": 10,
+  "sources_rejected": [
+    {
+      "official_landing_page": "https://www.ahrq.gov/chsp/data-resources/compendium-2023.html",
+      "reason": "Rejected for this narrow pass: the accepted current HRSA and CMS program files provide direct authoritative clinic identifiers; the much broader file does not add a required shared Stage 12 identifier.",
+      "source_title": "AHRQ 2023 Outpatient Site Linkage File"
+    },
+    {
+      "official_landing_page": "https://www.ahrq.gov/chsp/data-resources/compendium.html",
+      "reason": "Rejected as outside the six authorized objectives; this stage does not reconstruct general physician-group hierarchy.",
+      "source_title": "AHRQ historical Group Practice Linkage Files"
+    },
+    {
+      "official_landing_page": "https://data.hrsa.gov/topics/health-centers/uds",
+      "reason": "Rejected as duplicative for identity and out of scope for performance enrichment; no quality, revenue, or operational measures are authorized.",
+      "source_title": "HRSA 2024 UDS Awardee Performance Files"
+    },
+    {
+      "official_landing_page": "MULTIPLE_STATE_AGENCY_PAGES",
+      "reason": "Rejected from this national first pass because the official CMS plan-level file is accessible and consistent; no clinic-level plan coverage relationship is inferred from state plan lists.",
+      "source_title": "State-by-state Medicaid MCO web directories"
+    }
+  ],
+  "stage12_candidates_resolved": 5453,
+  "status": "HIPPRA_TARGETED_ACCOUNT_ENRICHMENT_REVIEW_REQUIRED",
+  "unresolved_candidates": 305306,
+  "warnings": [
+    {
+      "message": "Clinic identities cover HRSA sites and current Medicare-enrolled FQHC/RHC entities, not every U.S. clinic.",
+      "warning_code": "PARTIAL_NATIONAL_CLINIC_COVERAGE"
+    },
+    {
+      "message": "No accepted source explicitly documents plan-to-clinic or plan-to-network coverage.",
+      "warning_code": "UNAVAILABLE_MCO_CLINIC_RELATIONSHIPS"
+    },
+    {
+      "message": "Managed-care identities reflect the official 2024 CMS Medicaid enrollment report and state reporting conventions.",
+      "warning_code": "MCO_REPORTING_LIMITATION"
+    },
+    {
+      "message": "Hospital-system relationships reflect AHRQ calendar-year 2023 coverage.",
+      "warning_code": "AHRQ_TEMPORAL_LAG"
+    },
+    {
+      "count": 305306,
+      "message": "Candidates without a unique identifier-supported crosswalk remain unresolved or require review.",
+      "warning_code": "UNRESOLVED_STAGE12_CANDIDATES"
+    }
+  ],
+  "workflow_version": "hippra_targeted_account_enrichment_v1"
+}
