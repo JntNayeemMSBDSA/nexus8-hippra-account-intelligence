@@ -1,0 +1,27 @@
+# Local, raw, and regenerated analytical data
+data/
+raw/
+downloads/
+*.csv
+*.parquet
+*.duckdb
+*.hyper
+
+# Tableau session and cache files
+*.twbr
+.~*
+TableauTemp*
+
+# Runtime state and secrets
+*.pid
+*.lock
+*.log
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Local QA screenshots that have not been curated
+screenshots/tmp/
