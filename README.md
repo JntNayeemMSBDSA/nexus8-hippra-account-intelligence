@@ -12,7 +12,7 @@ My work was to reconstruct the account layer without turning repeated enrollment
 
 | Item | Detail |
 |---|---|
-| My role | Data scientist, analytics engineer, and Tableau developer |
+| My role | Business Analyst Intern |
 | Domain | Healthcare provider and organizational account intelligence |
 | Main tools | Python, SQL, DuckDB, Parquet, Hyper, Tableau |
 | Final dashboard grain | One row per certified commercial account |
