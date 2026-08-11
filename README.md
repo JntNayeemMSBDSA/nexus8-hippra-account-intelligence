@@ -1,197 +1,296 @@
-# HIPPRA Account Intelligence
+# How I Built HIPPRA's Healthcare Account Intelligence System
 
-## From fragmented federal healthcare files to a tested account model
+A file with 1.3 million provider records looks commercially useful until you try to answer a basic question: which organization is each clinician actually connected to?
 
-I started this project with a business question that sounded simple: which healthcare organizations can HIPPRA study, and how are providers, physician groups, hospitals, clinics, and health systems connected?
+That was the problem behind this project. HIPPRA was being developed as a collaboration platform for healthcare professionals. Individual clinicians could use the product, but organizations such as physician groups, hospitals, clinic networks, and health systems could also matter for partnerships, pilots, or enterprise adoption.
 
-The source data did not contain a ready-made account table. It contained separate provider, hospital, affiliation, enrollment, ownership, clinic, and health-system files. Each source used a different identifier and a different level of detail. Some relationships were explicit. Others were only possible matches. Missing values often meant unavailable or inapplicable, not zero.
+The federal data did not contain a clean table called `HIPPRA accounts`. It contained providers, practice organizations, enrollment records, hospital affiliations, owners, clinics, and health systems. Those files used different identifiers and described different kinds of relationships. A careless join could turn enrollment history into duplicate customers, a name match into a false parent company, or a missing percentage into zero ownership.
 
-My work was to reconstruct the account layer without turning repeated enrollment records, name matches, or missing data into false business facts. I built and certified the data system first. I then created the account model, added controlled enrichment, and built Tableau only after the analytical output passed reconciliation and quality checks.
+My job in this reconstruction was to turn those separate sources into a tested account model without claiming more than the evidence supported. I built the certified data foundation, resolved grain and missingness problems, created account and relationship marts, added targeted federal enrichment, prepared a stable Tableau source, and packaged a dashboard that opens without a database connection.
+
+This repository is the account-intelligence part of the HIPPRA work. It explains who the identifiable organizations are and how providers are connected to them. It intentionally stops before TAM, SAM, SOM, pricing, revenue, customer eligibility, and sales prioritization.
+
+![Executive Account Landscape dashboard](assets/executive-dashboard-preview.png)
+
+## What I was trying to answer
+
+The project centered on six questions:
+
+1. Which physician groups, hospitals, and health systems can be identified from authoritative public data?
+2. Which providers are connected to each account?
+3. When does a repeated affiliation represent a duplicate, and when does it preserve meaningful enrollment history?
+4. Which parent and child relationships are explicit enough to accept?
+5. Which possible relationships should remain candidates for human review?
+6. How can the final account model be explored without hiding missing or incomplete evidence?
+
+The dashboard came last. Most of the work happened before Tableau, when I decided what each row and relationship was allowed to mean.
 
 ## Project at a glance
 
-| Item | Detail |
-|---|---|
+| Item | Project detail |
+|---|---:|
 | My role | Business Analyst Intern |
-| Domain | Healthcare provider and organizational account intelligence |
 | Main tools | Python, SQL, DuckDB, Parquet, Hyper, Tableau |
-| Final dashboard grain | One row per certified commercial account |
-| Final account rows | 88,986 |
+| Provider source rows | 1,296,739 |
+| Hospital source rows | 5,432 |
+| Final commercial accounts | 88,986 |
+| Physician-group accounts | 83,367 |
+| Hospital accounts | 5,432 |
+| Health-system accounts | 187 |
 | Provider-account relationships | 3,079,707 |
-| Tableau deliverable | 14 worksheets and 3 dashboards |
-| Release result | 17 of 17 Tableau checks passed |
+| Providers linked to at least one final account | 1,072,710 |
+| Accounts with targeted enrichment | 6,830 |
+| Accounts with an evidence-review flag | 87,330 |
+| Tableau worksheets | 14 |
+| Tableau dashboards | 3 |
+| Final Tableau release checks | 17 of 17 passed |
 
-## The problem I had to solve
+The 3,079,707 relationship rows are not 3,079,707 unique providers. One provider can have relationships with multiple organizations. The final Tableau source therefore uses one row per account, while relationship counts are carried as account-level measures.
 
-The business concept of an account did not map cleanly to one government file. Before I could analyze anything, I had to answer several data-modeling questions:
+## Why the account model was difficult
 
-1. When should a provider organization become a physician-group account?
-2. When do two affiliation rows represent duplicates, and when do they represent separate enrollment lineage?
-3. How should a hospital owner differ from a health system?
-4. When is a clinic match strong enough to accept, and when should it remain a candidate for review?
-5. How can missing ratings, ownership percentages, and postal values stay visible without being converted into misleading zeroes?
-6. Which commercial questions are supported by the data, and which ones require more evidence?
+There was no single identifier shared by every source.
 
-Those questions shaped the pipeline. The dashboard was the final layer, not the starting point.
+- Providers use NPI.
+- Practices and physician organizations can use organization PAC ID or organization NPI.
+- Hospitals use CCN or Facility ID.
+- PECOS ownership data follows enrollment and associate identifiers.
+- HRSA clinics use health-center and site identifiers.
+- AHRQ health systems use their own system identifiers.
 
-## Data I worked with
+The files also had different grains. A provider file could have one row per NPI. An affiliation file could have one row per NPI, PAC enrollment, and hospital. An ownership file could have several owners for one enrollment. Flattening those sources into one table before understanding the grain would have inflated counts and erased useful lineage.
 
-The reconstruction combined fixed snapshots from CMS and other federal sources. The main inputs were:
+Missing values created another problem. A blank hospital rating may mean that the measure is unavailable or not applicable. A missing ownership percentage does not prove zero ownership. A military or foreign postal code should not be forced into a five-digit US ZIP format. I kept these conditions visible instead of making the data look more complete than it was.
 
-| Source | Level of detail | How I used it |
-|---|---|---|
-| Medicare Physician and Other Practitioners, 1,296,739 rows | Provider | Provider identity and descriptive measures |
-| CMS National Downloadable File | Provider, organization PAC ID, and practice location | Provider-to-group relationships and organization identity |
-| CMS Facility Affiliation Data, 2,260,193 rows | NPI, PAC enrollment, and hospital CCN | Provider-to-hospital relationships |
-| CMS Hospital General Information, 5,432 rows | Hospital CCN | Hospital identity, type, geography, and rating context |
-| CMS Hospital Enrollments, 9,175 rows | Enrollment | Hospital enrollment lineage |
-| CMS Hospital All Owners, 147,332 rows | Enrollment and owner | Ownership evidence and limited system-parent relationships |
-| HRSA health-center sites, 19,039 rows | Clinic site and health-center number | Clinic and clinic-network enrichment |
-| CMS FQHC and RHC enrollment files | Clinic enrollment | Authoritative clinic identity and candidate resolution |
-| AHRQ 2023 system and hospital-linkage files | Health system and hospital CCN | Explicit hospital-to-system enrichment |
-| Medicaid managed-care report | Program and plan | Plan identity only; it did not support clinic-level coverage links |
+## The source data
 
-I stored source checksums, file sizes, row and column counts, schemas, encodings, release periods, and retrieval status. When a historical retrieval timestamp could not be proven, I recorded it as `NOT_RECORDED` instead of inventing one.
+I combined fixed snapshots from CMS, HRSA, AHRQ, and a federal managed-care report.
 
-## What I did
+| Source | Rows | Source grain | What it contributed |
+|---|---:|---|---|
+| Medicare Physician and Other Practitioners | 1,296,739 | Rendering provider NPI | Provider identity and descriptive measures |
+| CMS National Downloadable File | Not stated here | Provider, organization PAC ID, practice location | Physician-group identity and provider-to-group links |
+| CMS Facility Affiliation Data | 2,260,193 | NPI, PAC enrollment, hospital CCN | Provider-to-hospital relationships and enrollment lineage |
+| CMS Hospital General Information | 5,432 | Hospital CCN | Hospital identity, type, geography, and rating context |
+| CMS Hospital Enrollments | 9,175 | Hospital enrollment | Enrollment lineage used with ownership evidence |
+| CMS Hospital All Owners | 147,332 | Enrollment and owner | Ownership evidence and limited system-parent relationships |
+| HRSA health-center sites | 19,039 | Clinic site and Health Center Number | Clinic and clinic-network enrichment |
+| CMS FQHC and RHC enrollments | Not stated here | Clinic enrollment and parent PAC relationship | Clinic identity and candidate resolution |
+| AHRQ Compendium, 2023 | Not stated here | Published system and CCN relationship | Explicit hospital-to-system enrichment |
+| Medicaid managed-care report | Not stated here | Program and plan | Plan identity only, with no clinic-coverage bridge |
 
-### 1. Audited and certified the reconstructed data foundation
+For each source, I recorded the file checksum, size, row and column counts, schema, encoding, release period, and retrieval status. If a historical retrieval time was not available, I recorded `NOT_RECORDED`. I did not invent a timestamp to make the registry look complete.
 
-I treated the existing raw files, DuckDB database, Parquet outputs, and successful quality records as protected inputs. New work was written to versioned locations. Every stage used checksums and structured state files so a rerun could resume safely without overwriting a successful result.
+The source files and local analytical database are intentionally not published here. This repository contains the curated Tableau release, code, documentation, and machine-readable QA.
 
-During this audit I found a serious state-management problem. The analytical build had succeeded, but the project was later marked `FAILED`. The cause was not bad data. A success path supplied `status` twice when it updated pipeline state, after the valid outputs and readiness marker had already been written.
+## How I built it
 
-I preserved the contradictory historical record, repaired the future state-writing logic, and added regression tests for:
+### 1. I certified the foundation before extending it
 
-* successful completion;
-* a real processing failure;
-* stale PID files;
-* interrupted cleanup;
-* valid analysis-ready output;
-* missing outputs;
-* failed quality checks.
+The existing raw files, DuckDB database, Parquet files, and successful QA records became protected inputs. New stages wrote versioned outputs rather than replacing earlier successful work. Checksums made it possible to prove that the protected files remained unchanged.
 
-The repaired system distinguishes `RUNNING`, `BUILD_READY`, `RELEASE_CERTIFIED`, `FAILED`, and `HUMAN_INPUT_REQUIRED`.
+This audit exposed a pipeline-state bug. A successful build had produced valid outputs and an analysis-ready marker, but a later state update supplied `status` twice and marked the run as failed. The data had not failed. The status-writing path had.
 
-### 2. Resolved the affiliation-grain problem without deleting evidence
+I preserved the contradictory historical record for audit, repaired the future state transition, and added regression tests covering:
 
-The affiliation data contained 47 repeated NPI and CCN combinations. A quick cleanup would have dropped them as duplicates. I traced them to different PAC enrollment lineage and kept that distinction.
+- successful completion;
+- a real processing failure;
+- a stale PID file;
+- interrupted cleanup;
+- valid analysis-ready output;
+- missing output files;
+- failed QA.
 
-I created two valid analytical representations:
+The corrected workflow distinguishes `RUNNING`, `BUILD_READY`, `RELEASE_CERTIFIED`, `FAILED`, and `HUMAN_INPUT_REQUIRED`.
 
-* NPI by hospital for provider-network counts;
-* NPI by PAC enrollment by hospital when enrollment lineage matters.
+### 2. I handled affiliation grain before counting networks
 
-This prevents inflated network counts while preserving the source history. The choice of grain is explicit rather than hidden inside a deduplication step.
+The facility-affiliation data contained 47 repeated NPI and CCN combinations. Removing them as duplicates would have lost the fact that the same provider-hospital relationship could appear through different PAC enrollment records.
 
-### 3. Modeled missingness instead of replacing it with zero
+I kept two views:
 
-Three quality problems needed separate handling:
+- **NPI by hospital CCN** for network-size questions;
+- **NPI by PAC enrollment by hospital CCN** when enrollment lineage matters.
 
-* 2,250 hospitals had no overall rating. I kept the rating null and added availability, applicability, and missing-reason fields.
-* 89,838 ownership rows had no ownership percentage. I kept those values null and added a missingness indicator. A missing percentage does not mean zero ownership.
-* 27 provider postal values were not five-digit domestic ZIP codes. I classified domestic standard, domestic nonstandard, military, foreign, missing, and unresolved values without padding or truncating them.
+That choice prevents network counts from being inflated while preserving the source history. The correct grain depends on the question, so the project stores both instead of silently choosing one.
 
-CMS suppression markers also remained separate from numeric values. Blank and suppressed measures were never parsed as zero.
+### 3. I kept missing values separate from zero
 
-### 4. Turned the commercial definition into a data contract
+Three examples shaped the missingness rules:
 
-I kept provider, clinic, physician group, hospital, health system, network, plan, account, and contract concepts separate. They are not interchangeable units.
+- **2,250 hospital ratings were missing.** The rating stayed null, with fields describing availability, applicability, and the missing reason.
+- **89,838 ownership percentages were missing.** The value stayed null and received a missingness indicator. It was never interpreted as zero ownership.
+- **27 provider postal values were not standard five-digit domestic ZIP codes.** I classified domestic standard, domestic nonstandard, military, foreign, missing, and unresolved values without padding, truncating, or converting them.
 
-The final identity rules were deliberately conservative:
+CMS suppression markers also stayed distinct from numbers. Blank and suppressed measures never became zero during parsing.
 
-* an organization PAC ID with an organization name can define a physician-group account;
-* an organization NPI explicitly typed as `Clinic or Group Practice` can define a physician-group account;
-* a CCN with a hospital name can define a hospital account;
-* a PECOS owner associate ID with an explicit chain or home-office flag can define a limited health-system account.
+### 4. I defined what could become an account
 
-Names and addresses alone never merge two authoritative identifiers. Exact name and location matches can create a review candidate, but not a final account. Fuzzy matching does not enter the certified account table.
+The account model separates providers, physician groups, clinics, clinic networks, hospitals, health systems, managed-care plans, accounts, and contracts. These are different entities with different identifiers and business meanings.
 
-### 5. Built the account marts and relationship bridges
+The final identity rules were conservative:
 
-I discovered source tables by their column signatures instead of hard-coding assumed table names. I then built separate structures for:
+- an organization PAC ID with an organization name can define a physician-group account;
+- an organization NPI explicitly typed as `Clinic or Group Practice` can define a physician-group account;
+- a hospital CCN with a hospital name can define a hospital account;
+- a PECOS owner associate ID with an explicit chain or home-office flag can define a limited health-system account.
 
-* commercial accounts;
-* provider-to-account relationships;
-* parent and child account relationships;
-* unresolved relationship candidates;
-* source gaps and evidence-review flags.
+Names and addresses alone never merge authoritative identifiers. An exact normalized name and address can produce a candidate, but not a final identity. Fuzzy matching does not enter the certified account table.
 
-The account layer produced 83,367 physician groups, 5,432 hospitals, and 187 health systems. It also retained 306,718 physician-practice candidates and 4,041 health-system candidates outside the final account table because the available evidence was not strong enough to promote them.
+For one targeted clinic-resolution rule, I required a CMS clinic enrollment to share the Stage 12 parent PAC ID and the exact normalized street, city, state, and five-digit ZIP prefix. Anything weaker stayed unresolved or went to review.
 
-### 6. Added targeted enrichment without changing certified identities
+### 5. I separated entities from relationships
 
-I added six versioned federal source snapshots for clinics, clinic networks, managed-care plans, and AHRQ health systems. This was a separate, joinable layer rather than a rewrite of the account mart.
+I built distinct account and bridge structures rather than flattening everything into a wide table:
 
-The enrichment work identified:
+- `commercial_account` stores one certified organization per account row;
+- the provider-account bridge stores provider relationships to physician groups and hospitals;
+- the parent-child bridge stores accepted organizational hierarchy;
+- relationship-candidate tables store possible links that do not meet the final evidence rule;
+- source-gap tables record relationships that the available source cannot establish.
 
-* 35,789 authoritative clinic records;
-* 1,526 clinic networks;
-* 19,039 explicit clinic-to-network relationships;
-* 639 AHRQ health systems;
-* 4,193 explicit hospital-to-system relationships;
-* 818 managed-care plan identities.
+The pipeline discovered source tables from their column signatures instead of relying on hard-coded table names. This made the reconstruction less fragile when a versioned upstream table name changed but its certified fields remained the same.
 
-The managed-care source did not document plan-to-clinic coverage. I therefore left that bridge empty. Creating a plausible-looking relationship would have produced a more complete dashboard, but it would not have been supported by the source.
+The account build produced:
 
-### 7. Prepared the Tableau layer at a stable grain
+- 83,367 physician groups;
+- 5,432 hospitals;
+- 187 health systems;
+- 88,986 total certified accounts;
+- 3,079,707 provider-account relationships.
 
-The Tableau source contains 57 fields and one row per `commercial_account_id`. I kept identifiers as dimensions, used additive relationship measures only where valid, and carried review flags and scope notes into the presentation layer.
+## Targeted enrichment
 
-I built three dashboards:
+The base account mart did not try to answer every organizational question. I added a separate, joinable enrichment layer using six versioned federal snapshots.
 
-1. **Executive Account Landscape** shows account counts, account mix, provider relationships, leading accounts, and enrichment coverage.
-2. **Network and Geography** explores approved state geography and provider-to-account network structure.
-3. **Data Quality and Account Explorer** exposes enrichment coverage, the evidence-review queue, and account-level details.
+That layer identified:
 
-The workbook contains 14 worksheets and is packaged with its certified Hyper extract so it opens without a database connection.
+| Enrichment output | Rows |
+|---|---:|
+| Authoritative clinic records | 35,789 |
+| Clinic networks | 1,526 |
+| Explicit clinic-to-network relationships | 19,039 |
+| AHRQ health systems | 639 |
+| Explicit hospital-to-system relationships | 4,193 |
+| Managed-care plan identities | 818 |
+| Clinic candidates requiring review | 337 |
+| Other relationship candidates | 604 |
 
-## How the pieces fit together
+The Stage 12 reconciliation reviewed 310,759 candidates. It resolved 5,453 through the approved evidence rules and left 305,306 unresolved or requiring review.
+
+One empty result is especially important: the managed-care source did not document plan-to-clinic or plan-to-network coverage. I left that bridge at zero rows. Filling it with plausible name or geography matches would have made the dashboard look richer, but the relationships would not have been supported by the source.
+
+The [enrichment methodology](docs/targeted_enrichment_methodology.md) and [coverage report](docs/targeted_enrichment_coverage_report.md) explain those rules and gaps.
+
+## Preparing the Tableau account layer
+
+The final Tableau source contains 57 fields and exactly one row per `commercial_account_id`.
+
+The fields include:
+
+- account type, name, and authoritative identifier;
+- state and safe postal classification;
+- provider relationship count and unique linked provider count;
+- direct child account count;
+- candidate relationship count;
+- targeted enrichment flag;
+- AHRQ health-system linkage count;
+- evidence-review flag and reason;
+- a data-scope note displayed in the workbook.
+
+Identifiers stay dimensions. Relationship measures are additive only at the account grain. Portfolio totals repeated on account rows must use `MIN` or `MAX`, not `SUM`. Those rules are documented in the [dashboard data dictionary](docs/DATA_DICTIONARY.md).
+
+I packaged the source as a Tableau Hyper extract inside a portable TWBX. The workbook opens locally without a live DuckDB connection.
+
+## What the dashboards show
+
+### Executive Account Landscape
+
+This dashboard answers the first portfolio questions:
+
+- How many certified accounts exist?
+- What is the mix of physician groups, hospitals, and health systems?
+- How many provider-account relationships are represented?
+- Which accounts have the largest linked provider networks?
+- How much of the account mart has targeted enrichment?
+
+### Network and Geography
+
+This view explores account distribution by approved state geography and compares provider-network structure across accounts. Invalid or unsupported postal values are excluded from maps, but they remain in the underlying account table with their classification.
+
+### Data Quality and Account Explorer
+
+This dashboard makes the evidence limits visible. It shows enrichment coverage, accounts that require evidence review, and account-level details. The review queue is part of the deliverable rather than a hidden cleanup list.
+
+The high review count needs context. The 87,330 accounts with `review_attention_required` are not 87,330 weak prospects. The flag means that at least one evidence limitation or unresolved relationship deserves attention. It is a data-review indicator, not a commercial score.
+
+## What the final numbers mean
+
+| Measure | Interpretation |
+|---|---|
+| 88,986 accounts | Organizations that passed the certified identity rules |
+| 83,367 physician groups | Group accounts identified through approved PAC ID or organization-NPI evidence |
+| 5,432 hospitals | Hospital accounts identified through CCN |
+| 187 health systems | Limited system accounts supported by the approved PECOS owner rule |
+| 3,079,707 provider-account relationships | Accepted links, with providers allowed to connect to more than one account |
+| 1,072,710 linked providers | Distinct providers connected to at least one final account, about 82.7 percent of the provider source |
+| 6,830 enriched accounts | Final accounts that received accepted targeted-enrichment evidence |
+| 87,330 review-attention accounts | Accounts carrying an evidence-gap flag, not a sales-priority label |
+
+![Certified account and quality summary](assets/release-summary.svg)
+
+The result is an organizational evidence layer. It can support account exploration, relationship analysis, enrichment planning, and later commercial work. It does not by itself establish demand, buyer eligibility, market size, or sales readiness.
+
+## Technical architecture
 
 ```mermaid
 flowchart LR
     A["Fixed federal source snapshots"] --> B["Certified DuckDB and Parquet foundation"]
-    B --> C["Commercial definition contract"]
+    B --> C["Commercial identity rules"]
     C --> D["Account marts and relationship bridges"]
     D --> E["Targeted enrichment and review candidates"]
-    E --> F["One-row-per-account Tableau source"]
-    F --> G["TWB and portable TWBX"]
-    G --> H["Reconciliation, package, and open tests"]
+    E --> F["One row per account Tableau source"]
+    F --> G["Hyper extract, TWB, and portable TWBX"]
+    G --> H["Reconciliation, package, and Tableau-open QA"]
 ```
 
-## Final result
+The current certified analytical system is DuckDB plus Parquet and CSV. Tableau reads the final account layer through Hyper. This pipeline was not executed in SQL Server. A SQL Server reconstruction would require separate DDL, transformations, and reconciliation.
 
-| Measure | Certified value |
-|---|---:|
-| Commercial accounts | 88,986 |
-| Physician groups | 83,367 |
-| Hospitals | 5,432 |
-| Health systems | 187 |
-| Provider-account relationships | 3,079,707 |
-| Providers linked to at least one final account | 1,072,710 of 1,296,739 |
-| Accounts with targeted enrichment | 6,830 |
-| Accounts carrying an evidence-review flag | 87,330 |
+The public repository contains:
 
-![Certified account and quality summary](assets/release-summary.svg)
+```text
+dashboard/  Tableau TWB and portable TWBX
+scripts/    deterministic workbook generation, packaging, validation, and release verification
+qa/         build, package, reconciliation, enrichment, and Tableau-open evidence
+docs/       architecture, field definitions, methodology, release notes, and Tableau guidance
+assets/     dashboard and release visuals
+```
 
-The review count is intentionally high. It indicates incomplete or unresolved evidence, not low commercial value. It is not a sales-priority score.
+The broader technical design is documented in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-## How I tested the release
+## How I validated the release
 
-The final validation checked both the data and the Tableau package:
+The final release checks covered both the account data and the Tableau package:
 
-* account rows reconciled to unique account IDs;
-* account-type counts and provider relationships matched the certified source;
-* protected source checksums remained unchanged;
-* the TWBX archive passed integrity checks;
-* the expected TWB, CSV, and Hyper members were present;
-* all 14 worksheets and all 3 dashboards were found;
-* required scope warnings were present;
-* Tableau Public 2026.2.1 loaded and opened the packaged workbook with zero detailed errors.
+- 88,986 source rows reconciled to 88,986 unique account IDs;
+- account IDs contained no nulls or duplicates;
+- account-type counts reconciled to 83,367 physician groups, 5,432 hospitals, and 187 health systems;
+- provider-account relationships reconciled to 3,079,707;
+- targeted enrichment reconciled to 6,830 accounts;
+- evidence-review flags reconciled to 87,330 accounts;
+- protected input checksums remained unchanged;
+- account-level measures were nonnegative;
+- postal geocoding failed closed for invalid formats;
+- the Tableau source reconciled across CSV, Parquet, and DuckDB;
+- the TWBX archive passed integrity and checksum tests;
+- the package contained the expected TWB, CSV, and Hyper members;
+- all 14 worksheets and all 3 dashboards were present;
+- required scope warnings appeared in the workbook;
+- Tableau Public 2026.2.1 loaded and opened the packaged workbook with zero detailed errors.
 
-The result was 17 passed checks out of 17.
+The final result was 17 passed checks out of 17. The machine-readable evidence is in [`qa/HIPPRA_Account_Intelligence_v2_qa.json`](qa/HIPPRA_Account_Intelligence_v2_qa.json).
 
-Run the repository-level verification with:
+Run the public release verifier with:
 
 ```bash
 python3 scripts/verify_repository_release.py
@@ -201,34 +300,30 @@ python3 scripts/verify_repository_release.py
 
 1. Install Tableau Public Desktop Edition 2026.2.1 or later.
 2. Download [`HIPPRA_Account_Intelligence_v2.twbx`](dashboard/HIPPRA_Account_Intelligence_v2.twbx).
-3. Open the file locally in Tableau Public.
+3. Open the workbook locally.
 
-The packaged workbook includes its certified extract. No database connection is required.
+The packaged workbook includes the certified Hyper extract, so no database connection is required.
 
-## What this repository contains
+## What this project does not claim
 
-This is a curated portfolio release. It includes the final workbook, the dashboard-facing semantic documentation, deterministic workbook and packaging code, and machine-readable quality evidence.
+This project does not claim that:
 
-The large raw snapshots, the local DuckDB database, and confidential commercial source notes are not copied into this public repository. Because of that boundary, this repository verifies and rebuilds the Tableau release from the certified presentation input; it is not a raw-data download bundle for recreating every upstream stage from zero.
+- all 88,986 accounts are HIPPRA prospects or eligible buyers;
+- the account count represents TAM, SAM, or SOM;
+- review-attention flags indicate commercial priority;
+- a provider-account relationship proves employment;
+- managed-care plans cover specific clinics or networks;
+- missing ratings or ownership percentages equal zero;
+- candidate relationships are confirmed links;
+- HIPPRA earned revenue or signed customers from this work;
+- the reconstructed pipeline ran in SQL Server.
 
-```text
-dashboard/  Tableau TWB and portable TWBX
-scripts/    workbook generation, packaging, validation, and release verification
-qa/         versioned build, package, reconciliation, and enrichment evidence
-docs/       architecture, field definitions, methodology, and build guidance
-assets/     project visuals
-```
-
-## Claims I did not make
-
-This project describes the account landscape and its evidence quality. It does not claim that the account count represents TAM, SAM, or SOM. It does not label an organization as a customer, prospect, eligible buyer, or sales priority. It does not calculate pricing, contract value, revenue, churn, or forecasts.
-
-The current certified analytical system is DuckDB and Parquet. I did not execute this reconstructed pipeline in SQL Server. SQL Server DDL, transformations, and reconciliation would be a separate future stage.
+Pricing, market sizing, and revenue forecasting belong to the separate HIPPRA commercial-analytics project. This repository provides an account and relationship foundation that can support those later questions when the evidence and business rules are available.
 
 ## What I learned
 
-The hardest part was not writing a join or drawing a chart. It was deciding what the rows were allowed to mean.
+The hardest part was deciding when not to create a relationship.
 
-An exact name match is not automatically the same organization. A repeated provider-to-hospital key is not automatically a duplicate. A missing ownership percentage is not zero. A useful commercial hypothesis is not the same thing as source evidence.
+It would have been easy to merge organizations because their names looked similar, drop repeated affiliations because their NPI and hospital matched, fill missing percentages with zero, or infer managed-care coverage from geography. Each shortcut would have made the output look cleaner. It also would have made the account model less trustworthy.
 
-Making those distinctions explicit produced a smaller set of final claims, but a much more defensible project.
+The final account table is useful because the unresolved evidence is still visible. I can explain why an organization became an account, which identifier supports it, how providers connect to it, which enrichment was accepted, and which questions still require human review.
